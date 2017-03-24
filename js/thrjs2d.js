@@ -28,6 +28,10 @@ var thrjs2d = (function() {
             camera.position.set(0,0,height/2);
             camera.lookAt({x:0, y:0, z:0}); // カメラ視野の中心座標を設定
         },
+        setCameraPosition:function(x, y, z){
+            //camera.position.set(x,y,z);
+            camera.lookAt({x:x, y:y, z:z});
+        },
         moveTo:function(x, y){
             this.sx = x;
             this.sy = y;
