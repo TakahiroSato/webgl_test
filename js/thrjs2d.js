@@ -21,12 +21,15 @@ var thrjs2d = (function() {
             height = div.clientHeight;
             renderer = new THREE.WebGLRenderer({antialias: false, alpha:true}); // レンダラーの生成
             renderer.setSize(width, height); // レンダラーのサイズをdivのサイズに設定
-            renderer.setClearColor(0x000000, 0); // レンダラーの背景色を白色（透過）に設定
+            renderer.setClearColor(0x000000, 1); // レンダラーの背景色を白色（透過）に設定
             div.appendChild(renderer.domElement); // div領域にレンダラーを配置
             scene = new THREE.Scene();  // シーンの生成
             // 座標軸を表示
             var axes = new THREE.AxisHelper(width);
             scene.add(axes);
+            var directionalLight = new THREE.DirectionalLight( 0xffffff );
+            directionalLight.position.set( 0, 0.7, 0.7 );
+            scene.add( directionalLight );
             camera = new THREE.PerspectiveCamera(fov, width/height, near, far);
             //camera = new THREE.OrthographicCamera(width/-2,width/2, height/2,height/-2,0.1,1000);
             camera.up.set(0,0,1);
@@ -81,7 +84,7 @@ var thrjs2d = (function() {
         drawBox:function(x, y, w, h, d, color){
             y *= -1;
             var boxGeo = new THREE.BoxGeometry(w, h, d);
-            var material = new THREE.MeshBasicMaterial({color: color});
+            var material = new THREE.MeshLambertMaterial({color: color});
             material.transparent = true;
             material.opacity = this.globalAlpha;
             var box = new THREE.Mesh(boxGeo, material);
