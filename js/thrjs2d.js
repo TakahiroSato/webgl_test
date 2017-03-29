@@ -5,7 +5,8 @@ var thrjs2d = (function() {
     var div;
     var width;
     var height;
-    var near = 0.001;   // 視体積手前までの距離
+    var fov = 90;   // 画角
+    var near = 0.1;   // 視体積手前までの距離
     var far = 1000; // 視体積奥までの距離
     var sx;
     var sy;
@@ -23,14 +24,17 @@ var thrjs2d = (function() {
             renderer.setClearColor(0x000000, 0); // レンダラーの背景色を白色（透過）に設定
             div.appendChild(renderer.domElement); // div領域にレンダラーを配置
             scene = new THREE.Scene();  // シーンの生成
-            //camera = new THREE.OrthographicCamera(width/-2, width/2, height/-2, height/2, near, far);
-            camera = new THREE.PerspectiveCamera(90, width/height, near, far);
+            // 座標軸を表示
+            var axes = new THREE.AxisHelper(width);
+            scene.add(axes);
+            camera = new THREE.PerspectiveCamera(fov, width/height, near, far);
+            //camera = new THREE.OrthographicCamera(width/-2,width/2, height/2,height/-2,0.1,1000);
+            camera.up.set(0,0,1);
             camera.position.set(0,0,height/2);
             camera.lookAt({x:0, y:0, z:0}); // カメラ視野の中心座標を設定
         },
         setCameraPosition:function(x, y, z){
-            //camera.position.set(x,y,z);
-            camera.lookAt({x:x, y:y, z:z});
+            camera.position.set(-x,y,height/2+z);
         },
         moveTo:function(x, y){
             this.sx = x;
@@ -58,7 +62,7 @@ var thrjs2d = (function() {
             scene.add(line);
         },
         fillRect:function(x, y, w, h){
-            this.drawRect(x, y, w, h, this.fillStyle);
+            return this.drawRect(x, y, w, h, this.fillStyle);
         },
         drawRect:function(x, y, w, h, color){
             y *= -1;
@@ -71,11 +75,30 @@ var thrjs2d = (function() {
             plane.position.y = y+(height-h)/2;
             plane.position.z = 0;
             scene.add(plane);
+
+            return plane;
+        },
+        drawBox:function(x, y, w, h, d, color){
+            y *= -1;
+            var boxGeo = new THREE.BoxGeometry(w, h, d);
+            var material = new THREE.MeshBasicMaterial({color: color});
+            material.transparent = true;
+            material.opacity = this.globalAlpha;
+            var box = new THREE.Mesh(boxGeo, material);
+            box.position.x = x-(width-w)/2;
+            box.position.y = y+(height-h)/2;
+            box.position.z = 0;
+            scene.add(box);
+
+            return box;
         },
         clear:function(){
             scene.children.forEach(function(object){
                 scene.remove(object);
             });
+        },
+        remove:function(obj){
+            scene.remove(obj);
         },
         render:function(){
             renderer.render(scene, camera);

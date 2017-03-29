@@ -2,7 +2,20 @@ var t = thrjs2d;
 
 t.init("canvas");
 
-t.fillRect(250, 50, 300, 400);
+t.fillStyle = "#ff0000";
+var rect = t.fillRect(0, 0, 30, 30);
+t.fillStyle = "#00ff00";
+var rect2 = t.fillRect(0, 100, 50, 50);
+
+t.fillStyle = "#0000ff";
+var box = t.drawBox(0,0,100,100,100, t.fillStyle);
+
+var boxs = [];
+
+for(var i = 0 ; i < 30 ; i++){
+    t.fillStyle = Math.floor(Math.random()*16581375*i);
+    boxs[i] = t.drawBox(600*Math.random(),600*Math.random(),i*5, i*5, i*5, t.fillStyle);
+}
 
 t.drawLine(0,0,100,100,100,"#aabbcc");
 
@@ -59,6 +72,19 @@ function reload(){
         z += addz;
         camera(x,y,z);
     }
+    t.render();
+    box.position.x += 0.2;
+    box.position.y -= 0.2;
+    box.rotation.z += 0.02;
+    box.rotation.y += 0.02;
+    box.rotation.x += 0.04;
+    for(var i = 0 ; i < 30 ; i++){
+        boxs[i].rotation.z += 0.001*(i % 2 == 0 ? -i : i);
+        boxs[i].rotation.y += 0.001*(i % 2 == 0 ? -i : i);
+        boxs[i].rotation.z += 0.001*(i % 2 == 0 ? -i : i);
+    }
+    requestAnimationFrame(reload);
 }
 
-setInterval(reload, 1);
+//setInterval(reload, 1);
+reload();
