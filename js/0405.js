@@ -6,6 +6,9 @@ var box = threejs.drawBox(0,0,100,100,100, threejs.fillStyle);
 var x = 0;
 var y = 0;
 var z = 0;
+var addX = 0;
+var addCnt = 0;
+var cnt = 0;
 
 var mousePos = {
     x:0,
@@ -17,11 +20,20 @@ $("#canvas").on("mousemove", function(e){
     mousePos.y = -e.clientY;
 });
 
+$("#canvas").on("click", function(){
+    addX = Math.PI/50;
+    addCnt = 1;
+});
+
 (function reload(){
-    x += 0.1;
-    y += 0.1;
+    x += addX;
+    cnt += addCnt;
+    if(cnt % 25 == 0){
+        addX = 0;
+        addCnt = 0;
+    }
     box.setPos(mousePos.x, mousePos.y, 0);
-    box.setRotation(x*0.2, y*0.1, z*0.5);
+    box.setRotation(x, y, z);
     threejs.render();
     requestAnimationFrame(reload);
 })();
