@@ -14,7 +14,7 @@ var boxs = [];
 
 for(var i = 0 ; i < 30 ; i++){
     t.fillStyle = Math.floor(Math.random()*16581375*i);
-    boxs[i] = t.drawBox(600*Math.random(),600*Math.random(),i*5, i*5, i*5, t.fillStyle);
+    boxs[i] = t.drawBox(i*10,i*10,i*5, i*5, i*5, t.fillStyle);
 }
 
 t.drawLine(0,0,100,100,100,"#aabbcc");
@@ -79,9 +79,9 @@ function reload(){
     box.rotation.y += 0.02;
     box.rotation.x += 0.04;
     for(var i = 0 ; i < 30 ; i++){
-        boxs[i].rotation.z += 0.001*(i % 2 == 0 ? -i : i);
-        boxs[i].rotation.y += 0.001*(i % 2 == 0 ? -i : i);
-        boxs[i].rotation.z += 0.001*(i % 2 == 0 ? -i : i);
+        boxs[i].rotation.z += 0.001*(i % 2 == 0 ? i : i);
+        boxs[i].rotation.y += 0.001*(i % 2 == 0 ? i : i);
+        boxs[i].rotation.z += 0.001*(i % 2 == 0 ? i : i);
     }
     requestAnimationFrame(reload);
 }

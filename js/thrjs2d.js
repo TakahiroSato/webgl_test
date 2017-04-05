@@ -5,9 +5,9 @@ var thrjs2d = (function() {
     var div;
     var width;
     var height;
-    var fov = 90;   // ç”»è§’
-    var near = 0.1;   // è¦–ä½“ç©æ‰‹å‰ã¾ã§ã®è·é›¢
-    var far = 1000; // è¦–ä½“ç©å¥¥ã¾ã§ã®è·é›¢
+    var fov = 90;   // »­½Ç
+    var near = 0.1;   // Ò•Ìå·eÊÖÇ°¤Ş¤Ç¤Î¾àëx
+    var far = 1000; // Ò•Ìå·e°Â¤Ş¤Ç¤Î¾àëx
     var sx;
     var sy;
 
@@ -19,22 +19,22 @@ var thrjs2d = (function() {
             div = document.getElementById(divid);
             width = div.clientWidth;
             height = div.clientHeight;
-            renderer = new THREE.WebGLRenderer({antialias: false, alpha:true}); // ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã®ç”Ÿæˆ
-            renderer.setSize(width, height); // ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã®ã‚µã‚¤ã‚ºã‚’divã®ã‚µã‚¤ã‚ºã«è¨­å®š
-            renderer.setClearColor(0x000000, 1); // ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã®èƒŒæ™¯è‰²ã‚’ç™½è‰²ï¼ˆé€éï¼‰ã«è¨­å®š
-            div.appendChild(renderer.domElement); // divé ˜åŸŸã«ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã‚’é…ç½®
-            scene = new THREE.Scene();  // ã‚·ãƒ¼ãƒ³ã®ç”Ÿæˆ
-            // åº§æ¨™è»¸ã‚’è¡¨ç¤º
+            renderer = new THREE.WebGLRenderer({antialias: false, alpha:true}); // ¥ì¥ó¥À¥é©`¤ÎÉú³É
+            renderer.setSize(width, height); // ¥ì¥ó¥À¥é©`¤Î¥µ¥¤¥º¤òdiv¤Î¥µ¥¤¥º¤ËÔO¶¨
+            renderer.setClearColor(0x000000, 1); // ¥ì¥ó¥À¥é©`¤Î±³¾°É«¤ò°×É«£¨Í¸ß^£©¤ËÔO¶¨
+            div.appendChild(renderer.domElement); // divîIÓò¤Ë¥ì¥ó¥À¥é©`¤òÅäÖÃ
+            scene = new THREE.Scene();  // ¥·©`¥ó¤ÎÉú³É
+            // ×ù˜ËİS¤ò±íÊ¾
             var axes = new THREE.AxisHelper(width);
             scene.add(axes);
             var directionalLight = new THREE.DirectionalLight( 0xffffff );
             directionalLight.position.set( 0, 0.7, 0.7 );
             scene.add( directionalLight );
-            camera = new THREE.PerspectiveCamera(fov, width/height, near, far);
-            //camera = new THREE.OrthographicCamera(width/-2,width/2, height/2,height/-2,0.1,1000);
+            //camera = new THREE.PerspectiveCamera(fov, width/height, near, far);
+            camera = new THREE.OrthographicCamera(width/-2,width/2, height/2,height/-2,0.1,1000);
             camera.up.set(0,0,1);
             camera.position.set(0,0,height/2);
-            camera.lookAt({x:0, y:0, z:0}); // ã‚«ãƒ¡ãƒ©è¦–é‡ã®ä¸­å¿ƒåº§æ¨™ã‚’è¨­å®š
+            camera.lookAt({x:0, y:0, z:0}); // ¥«¥á¥éÒ•Ò°¤ÎÖĞĞÄ×ù˜Ë¤òÔO¶¨
         },
         setCameraPosition:function(x, y, z){
             camera.position.set(-x,y,height/2+z);
@@ -51,17 +51,17 @@ var thrjs2d = (function() {
         drawLine:function(sx, sy, dx, dy, w, color){
             dy *= -1;
             sy *= -1;
-            // geometryã®å®£è¨€ã¨ç”Ÿæˆ
+            // geometry¤ÎĞûÑÔ¤ÈÉú³É
             var geometry = new THREE.Geometry();
-            // é ‚ç‚¹åº§æ¨™ã®è¿½åŠ 
+            // í”µã×ù˜Ë¤Î×·¼Ó
             geometry.vertices.push(new THREE.Vector3(sx-width/2, sy+height/2, 0));
             geometry.vertices.push(new THREE.Vector3(dx-width/2, dy+height/2, 0));
 
-            // ç·šã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç”Ÿæˆ
+            // ¾€¥ª¥Ö¥¸¥§¥¯¥È¤ÎÉú³É
             var material = new THREE.LineBasicMaterial({linewidth:w, color: color})
             var line = new THREE.Line(geometry, material);
 
-            // sceneã«lineã‚’è¿½åŠ 
+            // scene¤Ëline¤ò×·¼Ó
             scene.add(line);
         },
         fillRect:function(x, y, w, h){
@@ -88,11 +88,21 @@ var thrjs2d = (function() {
             material.transparent = true;
             material.opacity = this.globalAlpha;
             var box = new THREE.Mesh(boxGeo, material);
-            box.position.x = x-(width-w)/2;
-            box.position.y = y+(height-h)/2;
-            box.position.z = 0;
             scene.add(box);
 
+            box.setPos = function(x, y, z){
+                this.position.x = x-(width-w)/2;
+                this.position.y = y+(height-h)/2;
+                this.position.z = z;
+            }
+
+            box.setRotation = function(x, y, z){
+                this.rotation.x = x;
+                this.rotation.y = y;
+                this.rotation.z = z;
+            }
+
+            box.setPos(x, y, z);
             return box;
         },
         clear:function(){
