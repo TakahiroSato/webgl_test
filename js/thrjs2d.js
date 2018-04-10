@@ -5,7 +5,7 @@ var thrjs2d = (function() {
     var div;
     var width;
     var height;
-    var fov = 90;   // 画角
+    var fov = 45;   // 画角
     var near = 0.1;   // 視体積手前までの距離
     var far = 1000; // 視体積奥までの距離
     var sx;
@@ -25,16 +25,16 @@ var thrjs2d = (function() {
             div.appendChild(renderer.domElement); // div領域にレンダラーを配置
             scene = new THREE.Scene();  // シーンの生成
             // 座標軸を表示
-            var axes = new THREE.AxisHelper(width);
+            var axes = new THREE.AxesHelper(width);
             scene.add(axes);
             var directionalLight = new THREE.DirectionalLight( 0xffffff );
             directionalLight.position.set( 0, 0.7, 0.7 );
             scene.add( directionalLight );
             //camera = new THREE.PerspectiveCamera(fov, width/height, near, far);
-            camera = new THREE.OrthographicCamera(width/-2,width/2, height/2,height/-2,0.1,1000);
+            camera = new THREE.OrthographicCamera(width/-2,width/2, height/2,height/-2, near, far);
             camera.up.set(0,0,1);
             camera.position.set(0,0,height/2);
-            camera.lookAt({x:0, y:0, z:0}); // カメラ視野の中心座標を設定
+            //camera.lookAt({x:0, y:0, z:0}); // カメラ視野の中心座標を設定
         },
         setCameraPosition:function(x, y, z){
             camera.position.set(-x,y,height/2+z);
