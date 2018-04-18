@@ -5,11 +5,46 @@ var thrjs2d = (function() {
     var div;
     var width;
     var height;
-    var fov = 45;   // »­½Ç
-    var near = 0.1;   // Ò•Ìå·eÊÖÇ°¤Þ¤Ç¤Î¾àëx
-    var far = 1000; // Ò•Ìå·e°Â¤Þ¤Ç¤Î¾àëx
+    var fov = 45;       // ç”»è§’
+    var near = 0.1;     // è¦–ä½“ç©æ‰‹å‰ã¾ã§ã®è·é›¢
+    var far = 1000;     // è¦–ä½“ç©å¥¥ã¾ã§ã®è·é›¢
     var sx;
     var sy;
+    var backGroundColor = "0x000000";
+
+    var objectsArray = [];
+
+    function createEmptyObject(){
+        return {
+            mesh: null,
+            geometry: null,
+            material: null,
+            texture: null,
+            setPos: function(x, y, z){
+                this.mesh.setPos(x, y, z);
+            },
+            setRotation: function(x, y, z){
+                this.mesh.setRotation(x, y, z);
+            },
+            remove: function(){
+                if(objectsArray.indexOf(this) != -1){
+                    objectsArray.splice(objectsArray.indexOf(this), 1);
+                }
+                if(this.mesh !== null) scene.remove(this.mesh);
+                if(this.geometry !== null) this.geometry.dispose();
+                if(this.material !== null) this.material.dispose();
+                if(this.texture !== null) this.texture.dispose();
+
+                this.mesh = null;
+                this.geometry = null;
+                this.material = null;
+                this.texture = null;
+            },
+            isEmpty: function(){
+                return this.mesh === null ? true : false;
+            }
+        }
+    }
 
     return retObj = {
         fillStyle:0,
@@ -19,12 +54,12 @@ var thrjs2d = (function() {
             div = document.getElementById(divid);
             width = div.clientWidth;
             height = div.clientHeight;
-            renderer = new THREE.WebGLRenderer({antialias: false, alpha:true}); // ¥ì¥ó¥À¥é©`¤ÎÉú³É
-            renderer.setSize(width, height); // ¥ì¥ó¥À¥é©`¤Î¥µ¥¤¥º¤òdiv¤Î¥µ¥¤¥º¤ËÔO¶¨
-            renderer.setClearColor(0x000000, 1); // ¥ì¥ó¥À¥é©`¤Î±³¾°É«¤ò°×É«£¨Í¸ß^£©¤ËÔO¶¨
-            div.appendChild(renderer.domElement); // divîIÓò¤Ë¥ì¥ó¥À¥é©`¤òÅäÖÃ
-            scene = new THREE.Scene();  // ¥·©`¥ó¤ÎÉú³É
-            // ×ù˜ËÝS¤ò±íÊ¾
+            renderer = new THREE.WebGLRenderer({antialias: false, alpha:true}); // ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã®ç”Ÿæˆ
+            renderer.setSize(width, height); // ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã®ã‚µã‚¤ã‚ºã‚’divã®ã‚µã‚¤ã‚ºã«è¨­å®š
+            renderer.setClearColor(backGroundColor, 1); // ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã®èƒŒæ™¯è‰²ã‚’é»’è‰²ï¼ˆé€éŽï¼‰ã«è¨­å®š
+            div.appendChild(renderer.domElement); // divé ˜åŸŸã«ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã‚’é…ç½®
+            scene = new THREE.Scene();  // ã‚·ãƒ¼ãƒ³ã®ç”Ÿæˆ
+            // åº§æ¨™è»¸ã‚’è¡¨ç¤º
             var axes = new THREE.AxesHelper(width);
             scene.add(axes);
             var directionalLight = new THREE.DirectionalLight( 0xffffff );
@@ -34,7 +69,7 @@ var thrjs2d = (function() {
             camera = new THREE.OrthographicCamera(width/-2,width/2, height/2,height/-2, near, far);
             camera.up.set(0,0,1);
             camera.position.set(0,0,height/2);
-            //camera.lookAt({x:0, y:0, z:0}); // ¥«¥á¥éÒ•Ò°¤ÎÖÐÐÄ×ù˜Ë¤òÔO¶¨
+            //camera.lookAt({x:0, y:0, z:0}); // ã‚«ãƒ¡ãƒ©è¦–é‡Žã®ä¸­å¿ƒåº§æ¨™ã‚’è¨­å®š â€»three.jsã‚’0.89ã«updã—ãŸã‚‰è¡¨ç¤ºãŒãŠã‹ã—ããªã£ãŸ
         },
         setCameraPosition:function(x, y, z){
             camera.position.set(-x,y,height/2+z);
@@ -51,67 +86,64 @@ var thrjs2d = (function() {
         drawLine:function(sx, sy, dx, dy, w, color){
             dy *= -1;
             sy *= -1;
-            // geometry¤ÎÐûÑÔ¤ÈÉú³É
-            var geometry = new THREE.Geometry();
-            // í”µã×ù˜Ë¤Î×·¼Ó
-            geometry.vertices.push(new THREE.Vector3(sx-width/2, sy+height/2, 0));
-            geometry.vertices.push(new THREE.Vector3(dx-width/2, dy+height/2, 0));
-
-            // ¾€¥ª¥Ö¥¸¥§¥¯¥È¤ÎÉú³É
-            var material = new THREE.LineBasicMaterial({linewidth:w, color: color})
-            var line = new THREE.Line(geometry, material);
-
-            // scene¤Ëline¤ò×·¼Ó
-            scene.add(line);
+            var obj = createEmptyObject();
+            // geometryã®å®£è¨€ã¨ç”Ÿæˆ
+            obj.geometry = new THREE.Geometry();
+            // é ‚ç‚¹åº§æ¨™ã®è¿½åŠ 
+            obj.geometry.vertices.push(new THREE.Vector3(sx-width/2, sy+height/2, 0));
+            obj.geometry.vertices.push(new THREE.Vector3(dx-width/2, dy+height/2, 0));
+            // ç·šã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç”Ÿæˆ
+            obj.material = new THREE.LineBasicMaterial({linewidth:w, color: color})
+            obj.mesh = new THREE.Line(obj.geometry, obj.material);
+            objectsArray.push(obj);
+            // sceneã«lineã‚’è¿½åŠ 
+            scene.add(obj.mesh);
         },
         fillRect:function(x, y, w, h){
             return this.drawRect(x, y, w, h, this.fillStyle);
         },
         drawRect:function(x, y, w, h, color){
             y *= -1;
-            var planeGeo = new THREE.PlaneGeometry(w, h);
-            var material = new THREE.MeshBasicMaterial({color: color});
-            material.transparent = true;
-            material.opacity = this.globalAlpha;
-            var plane = new THREE.Mesh(planeGeo, material);
-            plane.position.x = x-(width-w)/2;
-            plane.position.y = y+(height-h)/2;
-            plane.position.z = 0;
-            scene.add(plane);
-
-            return plane;
+            var obj = createEmptyObject();
+            obj.geometry = new THREE.PlaneGeometry(w, h);
+            obj.material = new THREE.MeshBasicMaterial({color: color});
+            obj.material.transparent = true;
+            obj.material.opacity = this.globalAlpha;
+            obj.mesh = new THREE.Mesh(obj.geometry, obj.material);
+            obj.mesh.position.x = x-(width-w)/2;
+            obj.mesh.position.y = y+(height-h)/2;
+            obj.mesh.position.z = 0;
+            objectsArray.push(obj);
+            scene.add(obj.mesh);
+            return obj;
         },
         drawBox:function(x, y, w, h, d, color){
             y *= -1;
-            var boxGeo = new THREE.BoxGeometry(w, h, d);
-            var material = new THREE.MeshLambertMaterial({color: color});
-            material.transparent = true;
-            material.opacity = this.globalAlpha;
-            var box = new THREE.Mesh(boxGeo, material);
-            scene.add(box);
-
-            box.setPos = function(x, y, z){
+            var obj = createEmptyObject();
+            obj.geometry = new THREE.BoxGeometry(w, h, d);
+            obj.material = new THREE.MeshLambertMaterial({color: color});
+            obj.material.transparent = true;
+            obj.material.opacity = this.globalAlpha;
+            obj.mesh = new THREE.Mesh(obj.geometry, obj.material);
+            scene.add(obj.mesh);
+            obj.mesh.setPos = function(x, y, z){
                 this.position.x = x-(width-w)/2;
                 this.position.y = y+(height-h)/2;
                 this.position.z = z;
             }
-
-            box.setRotation = function(x, y, z){
+            obj.mesh.setRotation = function(x, y, z){
                 this.rotation.x = x;
                 this.rotation.y = y;
                 this.rotation.z = z;
             }
-
-            box.setPos(x, y, z);
-            return box;
+            obj.mesh.setPos(x, y, z);
+            objectsArray.push(obj);
+            return obj;
         },
         clear:function(){
-            scene.children.forEach(function(object){
-                scene.remove(object);
-            });
-        },
-        remove:function(obj){
-            scene.remove(obj);
+            while(objectsArray.length > 0){
+                objectsArray[0].remove();
+            }
         },
         render:function(){
             renderer.render(scene, camera);
