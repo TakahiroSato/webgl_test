@@ -67,9 +67,9 @@ var thrjs2d = (function() {
             scene.add( directionalLight );
             //camera = new THREE.PerspectiveCamera(fov, width/height, near, far);
             camera = new THREE.OrthographicCamera(width/-2,width/2, height/2,height/-2, near, far);
-            camera.up.set(0,0,1);
+            camera.up.set(0,1,0);
             camera.position.set(0,0,height/2);
-            //camera.lookAt({x:0, y:0, z:0}); // カメラ視野の中心座標を設定 ※three.jsを0.89にupdしたら表示がおかしくなった
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
         },
         setCameraPosition:function(x, y, z){
             camera.position.set(-x,y,height/2+z);
