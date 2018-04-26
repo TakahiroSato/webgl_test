@@ -1,6 +1,6 @@
-/* globals THREE, $ */
+/* globals THREE */
 
-var thrjs2d = (function() {
+var threeJsFor2D = (function() {
 	var renderer;
 	var scene;
 	var camera;
@@ -45,7 +45,7 @@ var thrjs2d = (function() {
 			isEmpty: function(){
 				return this.mesh === null ? true : false;
 			}
-		}
+		};
 	}
 
 	return retObj = {
@@ -77,13 +77,13 @@ var thrjs2d = (function() {
 			camera.position.set(-x,y,height/2+z);
 		},
 		moveTo:function(x, y){
-			this.sx = x;
-			this.sy = y;
+			sx = x;
+			sy = y;
 		},
 		lineTo:function(x, y){
-			this.drawLine(this.sx, this.sy, x, y, this.lineWidth, this.fillStyle);
-			this.sx = x;
-			this.sy = y;
+			this.drawLine(sx, sy, x, y, this.lineWidth, this.fillStyle);
+			sx = x;
+			sy = y;
 		},
 		drawLine:function(sx, sy, dx, dy, w, color){
 			dy *= -1;
@@ -138,7 +138,7 @@ var thrjs2d = (function() {
 				this.rotation.y = y;
 				this.rotation.z = z;
 			}
-			obj.mesh.setPos(x, y, z);
+			obj.mesh.setPos(x, y, 0);
 			objectsArray.push(obj);
 			return obj;
 		},

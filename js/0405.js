@@ -1,5 +1,5 @@
-/* globals thrjs2d, $ */
-var threejs = thrjs2d;
+/* globals threeJsFor2D, $ */
+var threejs = threeJsFor2D;
 threejs.init("canvas");
 
 threejs.fillStyle = "#0000ff";
