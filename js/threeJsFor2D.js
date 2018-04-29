@@ -1,6 +1,6 @@
 /* globals THREE */
 
-var threeJsFor2D = (function() {
+let threeJsFor2D = (function() {
 	var renderer;
 	var scene;
 	var camera;
@@ -12,7 +12,7 @@ var threeJsFor2D = (function() {
 	var far = 1000;     // 視体積奥までの距離
 	var sx;
 	var sy;
-	var backGroundColor = "0x000000";
+	var backGroundColor = "#000000";
 
 	var objectsArray = [];
 
@@ -23,7 +23,7 @@ var threeJsFor2D = (function() {
 			material: null,
 			texture: null,
 			setPos: function(x, y, z){
-				this.mesh.setPos(x, y, z);
+				this.mesh.setPos(x, y, z, this.geometry.parameters.width, this.geometry.parameters.height);
 			},
 			setRotation: function(x, y, z){
 				this.mesh.setRotation(x, y, z);
@@ -48,7 +48,7 @@ var threeJsFor2D = (function() {
 		};
 	}
 
-	return retObj = {
+	return {
 		fillStyle:0,
 		lineWidth:1,
 		globalAlpha:1,
@@ -95,7 +95,7 @@ var threeJsFor2D = (function() {
 			obj.geometry.vertices.push(new THREE.Vector3(sx-width/2, sy+height/2, 0));
 			obj.geometry.vertices.push(new THREE.Vector3(dx-width/2, dy+height/2, 0));
 			// 線オブジェクトの生成
-			obj.material = new THREE.LineBasicMaterial({linewidth:w, color: color})
+			obj.material = new THREE.LineBasicMaterial({linewidth:w, color: color});
 			obj.mesh = new THREE.Line(obj.geometry, obj.material);
 			objectsArray.push(obj);
 			// sceneにlineを追加
@@ -128,16 +128,16 @@ var threeJsFor2D = (function() {
 			obj.material.opacity = this.globalAlpha;
 			obj.mesh = new THREE.Mesh(obj.geometry, obj.material);
 			scene.add(obj.mesh);
-			obj.mesh.setPos = function(x, y, z){
+			obj.mesh.setPos = function(x, y, z, w, h){
 				this.position.x = x-(width-w)/2;
-				this.position.y = y+(height-h)/2;
+				this.position.y = -y+(height-h)/2;
 				this.position.z = z;
-			}
+			};
 			obj.mesh.setRotation = function(x, y, z){
 				this.rotation.x = x;
 				this.rotation.y = y;
 				this.rotation.z = z;
-			}
+			};
 			obj.mesh.setPos(x, y, 0);
 			objectsArray.push(obj);
 			return obj;
